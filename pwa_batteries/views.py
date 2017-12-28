@@ -20,17 +20,17 @@ class FetchJson(View):
 
     def put(self, *args, **kwargs):
         data = json.loads(self.request.body)
-        query_results = {has_error: False, items: []}
+        query_results = []
+        counter = -1
         for model_name, value in data:
+            counter += 1
             try:
                 model = apps.get_model(app_label=model_name)
             except Exception as exc:
-                query_results.append("invalid: %s" % model_name)
-                query_results["has_error"] = True
+                query_results.append("{}: invalid: {}".format(counter, model_name))
                 continue
             if not hasattr(model, "update_pwa_request"): # updates and check permission
-                query_results.append("invalid: %s" % model_name)
-                query_results["has_error"] = True
+                query_results.append("{}: invalid: {}".format(counter, model_name))
                 continue
             if "filter" in value or "exclude" in value:
                 query = model.objects.filter(**value.get("filter", {})).exclude(**value.get("exclude", {}))
@@ -43,29 +43,25 @@ class FetchJson(View):
                 # last parameter specifies if new objects should be created: False => create or bulk_create
                 last = model.update_pwa_request(query, value.get("data", {}), self.request, True)
 
-            query_results["items"].append(last)
             if last != "success":
-                query_results["has_error"] = True
+                query_results.append("{}: {}".format(counter, last))
         return JsonResponse(query_results)
 
     def delete(self, *args, **kwargs):
         data = json.loads(self.request.body)
-        query_results = {has_error: False, items: []}
-        for model_name, value in data:
+        query_results = []
+        for counter, (model_name, value) in enumerate(data):
             try:
                 model = apps.get_model(app_label=model_name)
             except Exception as exc:
-                query_results.append("invalid: %s" % model_name)
-                query_results["has_error"] = True
+                query_results.append("{}: invalid: {}".format(counter, model_name))
                 continue
             if not hasattr(model, "delete_pwa_request"): # updates and check permission
-                query_results.append("invalid: %s" % model_name)
-                query_results["has_error"] = True
+                query_results.append("{}: invalid: {}".format(counter, model_name))
                 continue
             query = model.objects.filter(**value.get("filter", {})).exclude(**value.get("exclude", {}))
             # delete_pwa_request should return "success" if successfull, errorstring elsewise
             last = model.delete_pwa_request(query, self.request)
-            query_results["items"].append(last)
-            if last != "success":
-                query_results["has_error"] = True
+        if last != "success":
+            query_results.append("{}: {}".format(counter, last))
         return JsonResponse(query_results)

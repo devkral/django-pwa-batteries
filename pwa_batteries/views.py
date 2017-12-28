@@ -18,8 +18,7 @@ class FetchJson(View):
             query_results[model_name] = model.process_pwa_query(query, self.request)
         return JsonResponse(query_results)
 
-class UpdateJson(View):
-    def post(self, *args, **kwargs):
+    def put(self, *args, **kwargs):
         data = json.loads(self.request.body)
         query_results = {has_error: False, items: []}
         for model_name, value in data:
@@ -49,8 +48,7 @@ class UpdateJson(View):
                 query_results["has_error"] = True
         return JsonResponse(query_results)
 
-class DeleteJson(View):
-    def post(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):
         data = json.loads(self.request.body)
         query_results = {has_error: False, items: []}
         for model_name, value in data:

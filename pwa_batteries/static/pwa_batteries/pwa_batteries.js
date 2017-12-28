@@ -1,11 +1,9 @@
-function create_pwa(furl, uurl, durl, init_cache={}){
-  o.fetch_url = furl;
-  o.update_url = uurl;
-  o.delete_url = durl;
+function create_pwa(endpoint_url, init_cache={}){
+  o.endpoint_url = endpoint_url;
   o.cache = init_cache;
 
   // real request
-  function _request(payload, url, callback_func){
+  function _request(payload, requesttype, callback_func){
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
     } else {
@@ -14,14 +12,14 @@ function create_pwa(furl, uurl, durl, init_cache={}){
 
     var xmlHttp = new XMLHttpRequest();
     if (callback_func){
-      xmlHttp.open("POST", url, true); // async request
+      xmlHttp.open(requesttype, o.endpoint_url, true); // async request
       xmlHttp.onreadystatechange = function() {
         if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
           callback_func(JSON.parse(http.responseText));
         }
       };
     } else{
-      xmlHttp.open("POST", url, false); // sync request
+      xmlHttp.open(requesttype, o.endpoint_url, false); // sync request
     }
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.setRequestHeader("Content-length", payloadstr.length);
@@ -49,7 +47,7 @@ function create_pwa(furl, uurl, durl, init_cache={}){
       callback_f = _update_cache_cb(name, callback_func);
     }
     // request data
-    var ret = _request(payload, o.fetch_url, callback_f);
+    var ret = _request(payload, "POST", callback_f);
     if (name && (o.cache[name] || callback_func)){
       return o.cache[name];
     } else if(name && !o.cache[name]){
@@ -61,12 +59,12 @@ function create_pwa(furl, uurl, durl, init_cache={}){
 
   // update pwa model data
   o.update = function(payload, callback_func=null) {
-    return _request(payload, o.update_url, callback_func);
+    return _request(payload, "PUT", callback_func);
   };
 
   // delete pwa model data
   o.delete = function(payload, callback_func=null) {
-    return _request(payload, o.delete_url, callback_func);
+    return _request(payload, "DELETE", callback_func);
   };
   return o;
 };

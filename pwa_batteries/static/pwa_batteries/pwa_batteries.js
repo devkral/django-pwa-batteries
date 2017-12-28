@@ -1,6 +1,15 @@
-function create_pwa(endpoint_url, init_cache={}){
+function create_pwa(endpoint_url, initial_state={}){
   o.endpoint_url = endpoint_url;
-  o.cache = init_cache;
+  if (initial_state["cache"]){
+    o.cache = initial_state["cache"];
+  } else {
+    o.cache = {};
+  }
+  if (initial_state["headers"]){
+    o.headers = initial_state["headers"];
+  } else {
+    o.headers = {};
+  }
 
   // real request
   function _request(payload, requesttype, callback_func){
@@ -20,6 +29,9 @@ function create_pwa(endpoint_url, init_cache={}){
       };
     } else{
       xmlHttp.open(requesttype, o.endpoint_url, false); // sync request
+    }
+    for (var header in o.headers) {
+      xmlHttp.setRequestHeader(header, o.headers[header]);
     }
     xmlHttp.setRequestHeader("Content-type", "application/json");
     xmlHttp.setRequestHeader("Content-length", payloadstr.length);
@@ -66,5 +78,9 @@ function create_pwa(endpoint_url, init_cache={}){
   o.delete = function(payload, callback_func=null) {
     return _request(payload, "DELETE", callback_func);
   };
+  // if initial query is defined, refresh synchronously/asynchronously depending on cache
+  if (initial_state["initial_query"]){
+    o.fetch(initial_state["initial_query"], null, "initial");
+  }
   return o;
 };

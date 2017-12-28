@@ -1,8 +1,8 @@
 django-pwa-batteries
 ====================
 
-Setup
-=====
+Installation
+============
 Install from PyPI:
 
 currently not possible
@@ -21,6 +21,8 @@ cd ./django-pwa-batteries
 pipenv install
 ```
 
+Setup
+=====
 
 Add `pwa_batteries` to your list of `INSTALLED_APPS` and add `PWA_SERVICE_WORKER_PATH="pwa_batteries/serviceworker.js"` in settings.py:
 

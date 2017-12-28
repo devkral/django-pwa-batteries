@@ -78,9 +78,5 @@ function create_pwa(endpoint_url, initial_state={}){
   o.delete = function(payload, callback_func=null) {
     return _request(payload, "DELETE", callback_func);
   };
-  // if initial query is defined, refresh synchronously/asynchronously depending on cache
-  if (initial_state["initial_query"]){
-    o.fetch(initial_state["initial_query"], null, "initial");
-  }
   return o;
 };

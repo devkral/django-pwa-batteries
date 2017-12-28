@@ -1,0 +1,3 @@
+include *.md
+recursive-include pwa_batteries/templates *
+recursive-include pwa_batteries/static *

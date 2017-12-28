@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     ...
 ]
 
-PWA_SERVICE_WORKER_PATH="pwa_batteries/serviceworker.js"
+PWA_SERVICE_WORKER_PATH = "pwa_batteries/serviceworker.js"
 ```
 
 Also set the pwa parameters from [django-progressive-web-app](http://github.com/svvitale/django-progressive-web-app "django-progressive-web-app")

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FetchJson, UpdateJson, DeleteJson
+from .views import EndpointJson
 
 # Serve up serviceworker.js and manifest.json at the root
 urlpatterns = [

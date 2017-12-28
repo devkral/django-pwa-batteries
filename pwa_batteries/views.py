@@ -3,22 +3,24 @@ from django.apps import apps
 from django.http import JsonResponse
 import json
 
-class FetchJson(View):
+class EndpointJson(View):
     def post(self, *args, **kwargs):
+        """ Fetch """
         data = json.loads(self.request.body)
         query_results = {}
-        for model_name, value in data.items():
+        for counter, (model_name, value) in enumerate(data):
             try:
                 model = apps.get_model(app_label=model_name)
             except Exception as exc:
                 continue
-            if not hasattr(model, "process_pwa_query"): # extracts allowed data from query
+            if not hasattr(model, "process_pwa_query"): # process data and check permissions (filter if no permission)
                 continue
             query = model.objects.filter(**value.get("filter", {})).exclude(**value.get("exclude", {}))
-            query_results[model_name] = model.process_pwa_query(query, self.request)
+            query_results[counter] = model.process_pwa_query(query, self.request)
         return JsonResponse(query_results)
 
     def put(self, *args, **kwargs):
+        """ Create/Update depending on filter,exclude """
         data = json.loads(self.request.body)
         query_results = []
         counter = -1
@@ -48,6 +50,7 @@ class FetchJson(View):
         return JsonResponse(query_results)
 
     def delete(self, *args, **kwargs):
+        """ Delete """
         data = json.loads(self.request.body)
         query_results = []
         for counter, (model_name, value) in enumerate(data):

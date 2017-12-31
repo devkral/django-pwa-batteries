@@ -1,79 +1,55 @@
-function create_pwa(endpoint_url, initial_state={}){
-  o.endpoint_url = endpoint_url;
-  if (initial_state["cache"]){
-    o.cache = initial_state["cache"];
-  } else {
-    o.cache = {};
-  }
-  if (initial_state["headers"]){
-    o.headers = initial_state["headers"];
-  } else {
-    o.headers = {};
+
+function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
+  var o;
+  o.init = caches.open(cache_name).then(function (cache) {
+    cache.match(resource).then(function (response) {
+      initial_state = JSON.parse(response.body)
+      o.endpoint_url = initial_state["endpoint_url"];
+      o.headers = initial_state["headers"];
+    }
   }
 
-  if (initial_state["timeout"]){
-    o.timeout = initial_state["timeout"];
-  } else {
-    o.timeout = 0;
-  }
-
-  // real request
-  function _request(payload, requesttype, callback_func, timeout){
+  function _request(payload, requesttype, cache_name){
+    var blob;
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
     } else {
       payloadstr = JSON.stringify(payload);
     }
+    var reqHeaders = o.headers.clone()
+    reqHeaders["Content-type"] = "application/json";
+    reqHeaders["Content-length"] = payloadstr.length;
+    reqHeaders["Connection"] = "close";
+    if (cache_name){
+      reqHeaders["pwa-cache-name"] = cache_name;
+    }
 
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open(requesttype, o.endpoint_url, true); // async request
-    xmlHttp.onreadystatechange = function() {
-      if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-        callback_func(JSON.parse(http.responseText));
-      }
-    };
-    if (timeout){
-      xmlHttp.timeout = timeout
-    } else {
-      xmlHttp.timeout = o.timeout
-    }
-    for (var header in o.headers) {
-      xmlHttp.setRequestHeader(header, o.headers[header]);
-    }
-    xmlHttp.setRequestHeader("Content-type", "application/json");
-    xmlHttp.setRequestHeader("Content-length", payloadstr.length);
-    xmlHttp.setRequestHeader("Connection", "close");
-    xmlHttp.send(payloadstr);
-  };
-  function _update_cache_cb(name, callback_func){
-    return function(data){
-      o.cache[name] = data;
-      callback_func(data);
-    };
+    var initReq = {
+      method: requesttype,
+      body: payloadstr,
+      headers: reqHeaders,
+      mode: 'cors',
+      cache: 'default',
+      credentials: 'include'
+    };;
+    return fetch(new Request(o.endpoint_url, initReq));
   };
 
   // fetch pwa model data
-  o.fetch = function(payload, callback_func, name=null, timeout=null) {
-    var callback_f = callback_func;
-    if (name && (callback_func || o.cache[name])){
-      callback_f = _update_cache_cb(name, callback_func);
-    }
+  o.fetch = function(payload, cache_name=null) {
     // request data
-    var ret = _request(payload, "POST", callback_f, timeout);
-    if (name && o.cache[name]){
-      return o.cache[name];
-    }
-    return undefined;
+    return _request(payload, "POST", cache_name);
   };
 
   // update pwa model data
-  o.update = function(payload, callback_func) {
-    return _request(payload, "PUT", callback_func, 0);
+  o.update = function(payload) {
+    return _request(payload, "PUT", null);
   };
 
   // delete pwa model data
-  o.delete = function(payload, callback_func) {
-    return _request(payload, "DELETE", callback_func, 0);
+  o.delete = function(payload) {
+    return _request(payload, "DELETE", null);
   };
+
   return o;
 };

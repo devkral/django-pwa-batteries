@@ -23,9 +23,7 @@ class EndpointJson(View):
         """ Create/Update depending on filter,exclude """
         data = json.loads(self.request.body)
         query_results = []
-        counter = -1
-        for model_name, value in data:
-            counter += 1
+        for counter, (model_name, value) in enumerate(data):
             try:
                 model = apps.get_model(app_label=model_name)
             except Exception as exc:

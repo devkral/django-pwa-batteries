@@ -9,7 +9,7 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
     }
   }
 
-  function _request(payload, requesttype, cache_name){
+  function _request(payload, requesttype, cache_item){
     var blob;
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
@@ -20,8 +20,8 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
     reqHeaders["Content-type"] = "application/json";
     reqHeaders["Content-length"] = payloadstr.length;
     reqHeaders["Connection"] = "close";
-    if (cache_name){
-      reqHeaders["pwa-cache-name"] = cache_name;
+    if (cache_item){
+      reqHeaders["pwa-cache-name"] = cache_item;
     }
 
     var initReq = {
@@ -31,7 +31,7 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
       mode: 'cors',
       cache: 'default',
       credentials: 'include'
-    };;
+    };
     return fetch(new Request(o.endpoint_url, initReq));
   };
 

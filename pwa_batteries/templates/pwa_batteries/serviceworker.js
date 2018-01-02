@@ -36,16 +36,18 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(fetch(event.request));
     return;
   }
-  // don't use cache
-  if (event.request.url.indexOf('{% url "pwa_endpoint_json" %})' !== -1 && (event.request.method == "PUT" || event.request.method == "DELETE") ) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
-
+  // specify cache name if POST
+  var cache_name;
   if (event.request.headers["pwa-cache-name"] && event.request.method == "POST"){
     cache_name = event.request.headers["pwa-cache-name"];
   } else {
     cache_name = event.request;
+  }
+
+  // don't use cache for PUT, TRACE, DELETE, PATCH or POST if not endpoint
+  if ((event.request.method !== "POST" ||  event.request.url.indexOf('{% url "pwa_endpoint_json" %})' == -1) && event.request.method !== "GET" && event.request.method !== "HEAD"){
+    event.respondWith(fetch(event.request));
+    return;
   }
 
   //if request in cache then return it, otherwise fetch it from the network

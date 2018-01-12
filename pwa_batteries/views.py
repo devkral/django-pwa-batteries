@@ -35,12 +35,13 @@ class EndpointJson(View):
             if "filter" in value or "exclude" in value:
                 query = model.objects.filter(**value.get("filter", {})).exclude(**value.get("exclude", {}))
                 # delete_pwa_request should return "success" if successfull, errorstring elsewise
-                # last parameter specifies if new objects should be created: query => update
-                last = model.update_pwa_request(value.get("data", {}), self.request, query)
+                # last parameter specifies if new objects should be created: False => update
+                last = model.update_pwa_request(query, value.get("data", {}), self.request, False)
             else:
+                query = model.objects.none()
                 # delete_pwa_request should return "success" if successfull, errorstring elsewise
-                # last parameter specifies if new objects should be created: None => create or bulk_create
-                last = model.update_pwa_request(value.get("data", {}), self.request, None)
+                # last parameter specifies if new objects should be created: False => create or bulk_create
+                last = model.update_pwa_request(query, value.get("data", {}), self.request, True)
 
             if last != "success":
                 query_results.append("{}: {}".format(counter, last))

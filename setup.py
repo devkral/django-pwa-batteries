@@ -11,6 +11,7 @@ except:
 
 install_requirements = [
     "django>=2",
+    "graphene_django",
     "django-progressive-web-app",
 ]
 setup(

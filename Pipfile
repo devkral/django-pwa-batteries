@@ -9,6 +9,7 @@ python_version = '3'
 [packages]
 
 django = '>=2'
+graphene_django = '*'
 django-progressive-web-app = '*'
 
 [dev-packages]

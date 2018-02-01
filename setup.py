@@ -16,7 +16,7 @@ install_requirements = [
 setup(
     name='django-pwa-batteries',
     version='0.1',
-    packages=find_packages("pwa_batteries"),
+    packages=find_packages(),
     install_requires=install_requirements,
     include_package_data=True,
     license='MIT License',

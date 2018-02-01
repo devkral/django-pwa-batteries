@@ -9,7 +9,7 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
     }
   }
 
-  function _request(payload, requesttype, cache_item){
+  function _request(payload, requesttype, cache_item, use_fresh){
     var blob;
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
@@ -22,6 +22,9 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
     reqHeaders["Connection"] = "close";
     if (cache_item){
       reqHeaders["pwa-cache-name"] = cache_item;
+    }
+    if (use_fresh){
+      reqHeaders["pwa-cache-fresh"] = "true";
     }
 
     var initReq = {
@@ -36,19 +39,19 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
   };
 
   // fetch pwa model data
-  o.fetch = function(payload, cache_name=null) {
+  o.fetch = function(payload, cache_name=null, use_fresh=false) {
     // request data
-    return _request(payload, "POST", cache_name);
+    return _request(payload, "POST", cache_name, use_fresh);
   };
 
   // update pwa model data
   o.update = function(payload) {
-    return _request(payload, "PUT", null);
+    return _request(payload, "PUT", null, false);
   };
 
   // delete pwa model data
   o.delete = function(payload) {
-    return _request(payload, "DELETE", null);
+    return _request(payload, "DELETE", null, false);
   };
 
   return o;

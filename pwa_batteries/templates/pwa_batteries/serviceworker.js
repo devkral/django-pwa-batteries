@@ -75,7 +75,7 @@ self.addEventListener('fetch', function (event) {
   }
 
   // fetch if not POST and endpoint or GET
-  if ((event.request.method !== "POST" ||  event.request.url.indexOf('{% url "pwa_endpoint_json" %})' == -1) && event.request.method !== "GET"){
+  if ((event.request.method !== "POST" ||  event.request.url.indexOf('{% url "pwa_endpoint_json" %})' == -1)) && event.request.method !== "GET"){
     event.respondWith(fetch(event.request));
     return;
   }

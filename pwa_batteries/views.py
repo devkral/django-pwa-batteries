@@ -1,7 +1,12 @@
 from django.views import View
+from django.views.generic import TemplateView
 from django.apps import apps
 from django.http import JsonResponse
 import json
+
+class ServedHelper(TemplateView):
+    template_name = "pwa_batteries/pwa_batteries.js"
+    content_type = "application/javascript"
 
 class EndpointJson(View):
     def post(self, *args, **kwargs):

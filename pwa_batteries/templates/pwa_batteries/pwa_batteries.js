@@ -1,13 +1,12 @@
 
-function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
+
+function create_pwa(){
   var o;
-  o.init = caches.open(cache_name).then(function (cache) {
-    cache.match(resource).then(function (response) {
-      initial_state = JSON.parse(response.body)
-      o.endpoint_url = initial_state["endpoint_url"];
-      o.headers = initial_state["headers"];
-    }
-  }
+{% block pwa_batteries_config %}
+  o.endpoint_url = '{% url "pwa_endpoint_json" %}';
+  o.headers = '{% url "pwa_endpoint_json" %}';
+  cache_name = "pwa_batteries-v1";
+{% endblock %}
 
   function _request(payload, requesttype, cache_item, use_fresh){
     var blob;
@@ -39,9 +38,9 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
   };
 
   // fetch pwa model data
-  o.fetch = function(payload, cache_name=null, use_fresh=false) {
+  o.fetch = function(payload, cache_item=null, use_fresh=false) {
     // request data
-    return _request(payload, "POST", cache_name, use_fresh);
+    return _request(payload, "POST", cache_item, use_fresh);
   };
 
   // update pwa model data
@@ -56,3 +55,7 @@ function create_pwa(cache_name="pwa_batteries-v1", resource="pwa_batteries"){
 
   return o;
 };
+
+{% block pwa_batteries_init %}
+pwa_bat = create_pwa();
+{% endblock %}

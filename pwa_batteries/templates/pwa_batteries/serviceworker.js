@@ -1,8 +1,7 @@
 {% load static %}
 
 {% block pwa_initial_state %}
-cached_urls = ['{% static "pwa_batteries/pwa_batteries.js" %}'];
-initial_state = {endpoint_url: '{% url "pwa_endpoint_json" %}'};
+cached_urls = ['{% url "pwa_batteries_helper" %}'];
 cache_name = "pwa_batteries-v1";
 {% endblock %}
 
@@ -41,9 +40,7 @@ function update_and_return(request, cache_ob_name) {
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(cache_name).then(function (cache) {
-      var p1 = cache.addAll(cached_urls);
-      var p2 = cache.put("pwa_batteries", initial_state);
-      return Promise.all([p1, p2]);
+      return cache.addAll(cached_urls);
     })
   );
 });
@@ -82,14 +79,10 @@ self.addEventListener('fetch', function (event) {
 
   if (event.request.headers["pwa-cache-fresh"] === "true"){
     // use fresh object
-    event.respondWith(
-      update_and_return(event.request, cache_ob_name);
-    );
+    event.respondWith(update_and_return(event.request, cache_ob_name));
   } else {
     //if request in cache then return it, otherwise fetch it from the network
-    event.respondWith(
-      use_cache(cache_ob_name) || fetch(event.request);
-    );
+    event.respondWith(use_cache(cache_ob_name) || fetch(event.request));
   }
 });
 {% endblock %}

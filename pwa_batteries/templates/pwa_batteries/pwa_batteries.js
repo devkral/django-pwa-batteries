@@ -1,11 +1,10 @@
 
 
 function create_pwa(){
-  var o;
+  var o = new Object();
 {% block pwa_batteries_config %}
   o.endpoint_url = '{% url "pwa_endpoint_json" %}';
   o.headers = '{% url "pwa_endpoint_json" %}';
-  cache_name = "pwa_batteries-v1";
 {% endblock %}
 
   function _request(payload, requesttype, cache_item, use_fresh){
@@ -57,5 +56,5 @@ function create_pwa(){
 };
 
 {% block pwa_batteries_init %}
-pwa_bat = create_pwa();
+pwa = create_pwa();
 {% endblock %}

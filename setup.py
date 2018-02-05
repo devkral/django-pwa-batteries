@@ -10,7 +10,7 @@ except:
     long_description = short_description
 
 install_requirements = [
-    "django>=2",
+    "django>=1.11,<3.0",
     "django-progressive-web-app",
 ]
 setup(

@@ -10,7 +10,7 @@ except:
     long_description = short_description
 
 install_requirements = [
-    "django>=1.11,<3.0",
+    "django>=1.11",
     "django-progressive-web-app",
 ]
 setup(
@@ -28,6 +28,7 @@ setup(
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
+        'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',

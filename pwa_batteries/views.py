@@ -2,18 +2,25 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.apps import apps
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 class ServedHelper(TemplateView):
     template_name = "pwa_batteries/pwa_batteries.js"
     content_type = "application/javascript"
 
+
 class EndpointJson(View):
+    @csrf_exempt
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
     def post(self, *args, **kwargs):
         """ Fetch """
         data = json.loads(self.request.body)
         query_results = {}
-        for counter, (model_name, value) in enumerate(data):
+        for counter, entry in enumerate(data):
+            model_name, value = list(entry.items())[0]
             try:
                 model = apps.get_model(app_label=model_name)
             except Exception as exc:

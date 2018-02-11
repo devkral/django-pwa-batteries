@@ -14,7 +14,7 @@ function create_pwa(){
     } else {
       payloadstr = JSON.stringify(payload);
     }
-    var reqHeaders = o.headers.clone()
+    var reqHeaders = Object.assign({}, o.headers);
     reqHeaders["Content-type"] = "application/json";
     reqHeaders["Content-length"] = payloadstr.length;
     reqHeaders["Connection"] = "close";

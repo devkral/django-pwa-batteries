@@ -63,26 +63,42 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(fetch(event.request));
     return;
   }
+
   // use pwa-cache-name if available
-  var cache_ob_name;
+  var cache_ob_name=null;
   if (event.request.headers["pwa-cache-name"]){
     cache_ob_name = event.request.headers["pwa-cache-name"];
-  } else {
-    cache_ob_name = event.request;
   }
 
-  // fetch if not POST and endpoint or GET
-  if ((event.request.method !== "POST" ||  event.request.url.indexOf('{% url "pwa_endpoint_json" %})' == -1)) && event.request.method !== "GET"){
+  // fetch if GET or (not POST and endpoint and cache name)
+  if (event.request.method !== "GET" && \
+      (event.request.method !== "POST" ||  \
+      event.request.url.indexOf('{% url "pwa_endpoint_json" %})' == -1) || \
+      !cache_ob_name)) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  if (event.request.headers["pwa-cache-fresh"] === "true"){
-    // use fresh object
-    event.respondWith(update_and_return(event.request, cache_ob_name));
-  } else {
-    //if request in cache then return it, otherwise fetch it from the network
-    event.respondWith(use_cache(cache_ob_name) || fetch(event.request));
+  // set cache_ob_name to request if not set
+  if (!cache_ob_name){
+    cache_ob_name = event.request;
+  }
+
+  switch(event.request.headers["pwa-cache-control"]){
+    case "fresh":
+      // use fresh object if possible and update cache
+      // fallback to cache
+      event.respondWith(update_and_return(event.request, cache_ob_name) || use_cache(cache_ob_name));
+      break;
+    case "cache":
+      // use cache only
+      event.respondWith((use_cache(cache_ob_name));
+      break;
+    case "failupdate":
+    default:
+      // if the request is cached return it,
+      // otherwise try to fetch it from the network and update cache
+      event.respondWith(use_cache(cache_ob_name) || update_and_return(event.request, cache_ob_name));
   }
 });
 {% endblock %}

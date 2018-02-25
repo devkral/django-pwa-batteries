@@ -7,7 +7,7 @@ function create_pwa(){
   o.headers = '{% url "pwa_endpoint_json" %}';
 {% endblock %}
 
-  function _request(payload, requesttype, cache_item, use_fresh){
+  function _request(payload, requesttype, cache_item, pwa_cache_control){
     var blob;
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
@@ -21,8 +21,8 @@ function create_pwa(){
     if (cache_item){
       reqHeaders["pwa-cache-name"] = cache_item;
     }
-    if (use_fresh){
-      reqHeaders["pwa-cache-fresh"] = "true";
+    if (pwa_cache_control){
+      reqHeaders["pwa-cache-control"] = pwa_cache_control;
     }
 
     var initReq = {
@@ -37,9 +37,9 @@ function create_pwa(){
   };
 
   // fetch pwa model data
-  o.fetch = function(payload, cache_item=null, use_fresh=false) {
+  o.fetch = function(payload, cache_item=null, pwa_cache_control=null) {
     // request data
-    return _request(payload, "POST", cache_item, use_fresh);
+    return _request(payload, "POST", cache_item, pwa_cache_control);
   };
 
   // update pwa model data

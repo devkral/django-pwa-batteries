@@ -7,7 +7,7 @@ function create_pwa(){
   o.headers = '{% url "pwa_endpoint_json" %}';
 {% endblock %}
 
-  function _request(payload, requesttype, cache_item, pwa_cache_control){
+  function _request(payload, requesttype, cache_item, cache_control){
     var blob;
     if (typeof payload === 'string' || payload instanceof String){
       payloadstr = payload;
@@ -21,35 +21,32 @@ function create_pwa(){
     if (cache_item){
       reqHeaders["pwa-cache-name"] = cache_item;
     }
-    if (pwa_cache_control){
-      reqHeaders["pwa-cache-control"] = pwa_cache_control;
-    }
 
     var initReq = {
       method: requesttype,
       body: payloadstr,
       headers: reqHeaders,
       mode: 'cors',
-      cache: 'default',
+      cache: cache_control,
       credentials: 'include'
     };
     return fetch(new Request(o.endpoint_url, initReq));
   };
 
   // fetch pwa model data
-  o.fetch = function(payload, cache_item=null, pwa_cache_control=null) {
+  o.fetch = function(payload, cache_item=null, cache_control="default") {
     // request data
-    return _request(payload, "POST", cache_item, pwa_cache_control);
+    return _request(payload, "POST", cache_item, cache_control);
   };
 
   // update pwa model data
   o.update = function(payload) {
-    return _request(payload, "PUT", null, false);
+    return _request(payload, "PUT", null, "no-store");
   };
 
   // delete pwa model data
   o.delete = function(payload) {
-    return _request(payload, "DELETE", null, false);
+    return _request(payload, "DELETE", null, "no-store");
   };
 
   return o;

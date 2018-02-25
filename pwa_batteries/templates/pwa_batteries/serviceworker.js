@@ -14,18 +14,18 @@ function use_cache(cache_ob_name) {
   });
 }
 
-// return in error case old cache object
 function update_and_return(request, cache_ob_name) {
-  return caches.open(cache_name).then(function (cache) {
-    return fetch(request).then(function (response) {
-      return cache.put(cache_ob_name, response).then(function(){
-        return response;
-      });
-    }, function (response) {
-      return cache.match(cache_ob_name).then(function (matching) {
-        return matching || Promise.reject('no-match');
-      });
-    });
+  return fetch(request).then(function (response) {
+    // Check if we received a valid response
+    if(!response || response.status !== 200) {
+      return response;
+    }
+    // needs to be cloned
+    var clonedresp = response.clone();
+    caches.open(cache_name).then(function (cache) {
+      cache.put(cache_ob_name, clonedresp);
+    }
+    return response;
   });
 }
 
@@ -82,26 +82,24 @@ self.addEventListener('fetch', function (event) {
     cache_ob_name = event.request;
   }
 
-  switch(event.request.headers["pwa-cache-control"]){
-    case "fresh":
-      // use fresh object if possible and update cache
-      // fallback to cache
-      event.respondWith(update_and_return(event.request, cache_ob_name) || use_cache(cache_ob_name));
+  switch(event.request.cache){
+    case "no-store":
+      // request directly don't update cache
+      event.respondWith(fetch(event.request));
       break;
-    case "onlyfresh":
-      // use fresh object if possible and update cache
-      // no fallback to cache
-      event.respondWith(update_and_return(event.request, cache_ob_name)));
-      break;
-    case "onlycache":
-      // use cache only
-      event.respondWith((use_cache(cache_ob_name));
-      break;
-    case "failupdate":
-    default:
+    case "force-cache":
       // if the request is cached return it,
       // otherwise try to fetch it from the network and update cache
       event.respondWith(use_cache(cache_ob_name) || update_and_return(event.request, cache_ob_name));
+      break;
+    case "reload":
+      event.respondWith(update_and_return(event.request, cache_ob_name));
+      break;
+    case "default":
+    default:
+      // try to fetch it from the network (if stale) and update cache
+      // fallback to cache
+      event.respondWith(update_and_return(event.request, cache_ob_name) || use_cache(cache_ob_name));
   }
 });
 {% endblock %}

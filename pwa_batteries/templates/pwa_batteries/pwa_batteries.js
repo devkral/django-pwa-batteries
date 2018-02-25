@@ -4,7 +4,7 @@ function create_pwa(){
   var o = new Object();
 {% block pwa_batteries_config %}
   o.endpoint_url = '{% url "pwa_endpoint_json" %}';
-  o.headers = '{% url "pwa_endpoint_json" %}';
+  o.headers = {};
 {% endblock %}
 
   function _request(payload, requesttype, cache_item, cache_control){

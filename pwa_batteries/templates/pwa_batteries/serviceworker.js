@@ -1,5 +1,3 @@
-{% load static %}
-
 {% block pwa_initial_state %}
 cached_urls = ['{% url "pwa_batteries_helper" %}'];
 cache_name = "pwa_batteries-v1";
@@ -90,7 +88,12 @@ self.addEventListener('fetch', function (event) {
       // fallback to cache
       event.respondWith(update_and_return(event.request, cache_ob_name) || use_cache(cache_ob_name));
       break;
-    case "cache":
+    case "onlyfresh":
+      // use fresh object if possible and update cache
+      // no fallback to cache
+      event.respondWith(update_and_return(event.request, cache_ob_name)));
+      break;
+    case "onlycache":
       // use cache only
       event.respondWith((use_cache(cache_ob_name));
       break;

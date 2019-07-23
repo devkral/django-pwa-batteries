@@ -1,5 +1,9 @@
 django-pwa-batteries
 ====================
+NOTE: django-pwa is currently the way to go, I may restart development as an abstraction layer for easier pwas
+until now the repo can be considered broken
+
+
 
 Installation
 ============
@@ -13,12 +17,12 @@ Install from Github (development):
 pip install git+https://github.com/devkral/django-pwa-batteries.git
 ```
 
-Install with pipenv:
+Install with poetry:
 
 ```
 git clone https://github.com/devkral/django-pwa-batteries.git
 cd ./django-pwa-batteries
-pipenv install
+poetry install
 ```
 
 Setup
@@ -42,7 +46,7 @@ PWA_SERVICE_WORKER_PATH = "<path to myworker>"
 ```
 
 
-Also set the pwa parameters from [django-progressive-web-app](http://github.com/svvitale/django-progressive-web-app "django-progressive-web-app")
+Also set the pwa parameters from [django-pwa](https://github.com/silviolleite/django-pwa "django-pwa")
 
 License
 =======
